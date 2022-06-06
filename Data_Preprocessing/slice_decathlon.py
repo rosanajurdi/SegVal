@@ -1,19 +1,16 @@
 #!/usr/bin/env python3.6
 
-import random
-import pickle
 import argparse
 import warnings
+from functools import partial
 from pathlib import Path
 from pprint import pprint
-from functools import partial
-from typing import Dict, List, Tuple
-from PIL import Image
-import numpy as np
+
 import nibabel as nib
-from tqdm import tqdm
+import numpy as np
 from skimage.io import imsave
 from skimage.transform import resize
+from typing import Dict, List, Tuple
 
 from utils import mmap_, uc_, map_, augment_arr
 
@@ -32,9 +29,6 @@ def get_p_id(path: Path) -> str:
     res = path.name.split('.nii')[0]
 
     return res
-
-
-import csv
 
 
 def save_slices(IM_path, gt_path,
@@ -131,8 +125,15 @@ import os
 
 
 def main(args: argparse.Namespace):
-    train_path: Path = Path(os.path.join(args.source_dir, 'train'))
-    val_path: Path = Path(os.path.join(args.source_dir, 'val'))
+    if args.type == 'test':
+        train_path: Path = Path(os.path.join(args.source_dir, 'train', 'root'))
+        val_path: Path = Path(os.path.join(args.source_dir, 'test'))
+    elif args.type == 'val':
+        train_path: Path = Path(os.path.join(args.source_dir, 'train'))
+        val_path: Path = Path(os.path.join(args.source_dir, 'val'))
+
+
+
     dest_path: Path = Path(args.dest_dir)
 
     # Assume the cleaning up is done before calling the script
@@ -207,6 +208,7 @@ def get_args() -> argparse.Namespace:
     parser.add_argument('--gt_dir', type=str, default="GT")
     parser.add_argument('--shape', type=int, nargs="+", default=[256, 256])
     parser.add_argument('--retain', type=int, default=0, help="Number of retained patient for the validation data")
+    parser.add_argument('--type', type=str, default='val', help="val or test")
     parser.add_argument('--n_augment', type=int, default=0,
                         help="Number of augmentation to create per image, only for the training set")
     parser.add_argument('--discard_negatives', action='store_true', default=False)

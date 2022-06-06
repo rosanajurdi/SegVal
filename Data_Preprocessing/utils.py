@@ -1,23 +1,21 @@
 #!/usr/bin/env python3.6
 
-from random import random
-from pathlib import Path
-from multiprocessing.pool import Pool
-
-from typing import Any, Callable, Iterable, List, Set, Tuple, TypeVar, Union
-
-import torch
-import numpy as np
-from tqdm import tqdm
-from torch import einsum
-from torch import Tensor
 from functools import partial
-from skimage.io import imsave
+from multiprocessing.pool import Pool
+from pathlib import Path
+from random import random
+
+import numpy as np
+import scipy as sp
+import torch
 from PIL import Image, ImageOps
 from scipy.ndimage import distance_transform_edt as distance
 from scipy.spatial.distance import directed_hausdorff
-
-import scipy as sp
+from skimage.io import imsave
+from torch import Tensor
+from torch import einsum
+from tqdm import tqdm
+from typing import Any, Callable, Iterable, List, Set, Tuple, TypeVar, Union
 
 # functions redefinitions
 tqdm_ = partial(tqdm, ncols=175,

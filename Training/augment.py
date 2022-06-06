@@ -1,12 +1,11 @@
 #!/usr/bin/env python3.6
 
 import argparse
-from typing import List
-from pathlib import Path
 from functools import partial
+from pathlib import Path
 
-from tqdm import tqdm
 from PIL import Image
+from typing import List
 
 from utils import augment, map_, mmap_
 

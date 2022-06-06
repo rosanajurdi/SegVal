@@ -2,7 +2,9 @@
 
 import torch
 from torch import Tensor
+
 from utils import eq
+
 
 class ConstantBounds():
     def __init__(self, **kwargs):

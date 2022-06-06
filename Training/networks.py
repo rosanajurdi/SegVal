@@ -2,16 +2,13 @@
 
 
 import math
-
-import torch
-from torch import nn
 from torch import Tensor
+from torch import nn
 
-from layers import upSampleConv, conv_block_1, conv_block_3_3, conv_block_Asym
 from layers import conv_block, conv_block_3, maxpool, conv_decod_block
-
-
+from layers import conv_block_1, conv_block_3_3, conv_block_Asym
 from layers import upSampleConv, convBatch, residualConv
+
 
 def weights_init(m):
     if type(m) == nn.Conv2d or type(m) == nn.ConvTranspose2d:
@@ -136,8 +133,7 @@ import torch
 import torch.nn as nn
 from torch.nn import Module
 import torch.nn.functional as F
-import numpy as np
-import matplotlib.pyplot as plt
+
 
 class DownConv(Module):
     def __init__(self, in_feat, out_feat, drop_rate=0.4, bn_momentum=0.1):

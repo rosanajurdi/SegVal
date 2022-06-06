@@ -2,23 +2,23 @@
 
 import argparse
 import warnings
-from pathlib import Path
 from functools import reduce
 from operator import add, itemgetter
+from pathlib import Path
 from shutil import copytree, rmtree
-from typing import Any, Callable, List, Tuple
 
-import torch
 import numpy as np
 import pandas as pd
+import torch
 import torch.nn.functional as F
 from torch import Tensor
 from torch.utils.data import DataLoader
+from typing import Any, Callable, List, Tuple
 
-from networks import weights_init
 from dataloader import get_loaders
-from utils import map_
+from networks import weights_init
 from utils import dice_coef, dice_batch, save_images, tqdm_, haussdorf
+from utils import map_
 from utils import probs2one_hot, probs2class
 
 
@@ -256,26 +256,26 @@ def run(args: argparse.Namespace) -> None:
 
 def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Hyperparams')
-    parser.add_argument('--dataset', type=str, default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task04_Hippocampus/Splits/train/fold_1/npy')
+    parser.add_argument('--dataset', type=str, default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task01_BrainTumour/Splits/train/csv/npy')
     parser.add_argument("--csv", type=str, default= 'metrics.csv')
-    parser.add_argument("--workdir", type=str, default = '/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task04_Hippocampus/Splits/train/fold_1')
+    parser.add_argument("--workdir", type=str, default = '/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task01_BrainTumour/Splits/train/csv/results')
     parser.add_argument('--batch_size', type=int, default=1)
     parser.add_argument("--cpu", action='store_true', default = True)
     parser.add_argument("--debug", action="store_true", default = True)
-    parser.add_argument("--modalities", type=int, default=1)
+    parser.add_argument("--modalities", type=int, default=4)
     parser.add_argument("--weights", type=str, default='', help="Stored weights to restore")
     parser.add_argument('--n_epoch', nargs='?', type=int, default=200,
                         help='# of the epochs')
     parser.add_argument('--l_rate', nargs='?', type=float, default=0.001,
                         help='Learning Rate')
     parser.add_argument("--compute_haussdorf", action='store_true')
-    parser.add_argument("--network", type=str,  help="The network to use", default='UNet')
+    parser.add_argument("--network", type=str,  help="The network to use", default='ResidualUNet')
     parser.add_argument("--grp_regex", type=str, default='(\d+_\d+)_\d+')
-    parser.add_argument("--n_class", type=int,  default=3)
+    parser.add_argument("--n_class", type=int,  default=4)
     parser.add_argument("--metric_axis", type=int, nargs='+', help="Classes to display metrics", default=[1])
     parser.add_argument("--in_memory", action='store_true')
     parser.add_argument("--schedule", action='store_true')
-    parser.add_argument("--group", action='store_true', help="Group the patient slices together for validation. \
+    parser.add_argume nt("--group", action='store_true', help="Group the patient slices together for validation. \
         Useful to compute the 3d dice, but might destroy the memory for datasets with a lot of slices per patient.")
 
     parser.add_argument("--losses", type=str, 

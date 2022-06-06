@@ -2,20 +2,13 @@
 
 from typing import List
 
-import torch
 import numbers
 import math
 from torch import Tensor, einsum
-from torch import nn
 from utils import simplex, one_hot
-from scipy.ndimage import distance_transform_edt, morphological_gradient, distance_transform_cdt
-from skimage.measure import label, regionprops
-import matplotlib.pyplot as plt
-from torch.nn import functional as F
+from scipy.ndimage import distance_transform_edt, morphological_gradient
 
-from utils import soft_skeletonize, contour, soft_length
-
-
+from utils import soft_skeletonize, contour
 
 
 class contour_loss():
@@ -208,10 +201,6 @@ def opencv_skelitonize(img):
         if zeros==size:
             done = True
     return skel
-
-
-
-
 
 
 

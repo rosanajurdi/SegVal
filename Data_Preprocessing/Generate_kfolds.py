@@ -19,6 +19,7 @@ nb_val: the number of validation samples (recommended to be 20% of the total tra
 import os
 import random
 import shutil
+
 from DataSEt_Classes import Decathlon
 
 typ = 'ROOT'

@@ -1,19 +1,16 @@
 #!/usr/bin/env python3.6
 
-import random
-import pickle
 import argparse
+import random
 import warnings
+from functools import partial
 from pathlib import Path
 from pprint import pprint
-from functools import partial
-from typing import Dict, List, Tuple
-from PIL import Image
-import numpy as np
+
 import nibabel as nib
-from tqdm import tqdm
-from skimage.io import imsave
+import numpy as np
 from skimage.transform import resize
+from typing import Dict, List, Tuple
 
 from utils import mmap_, uc_, map_, augment_arr
 
@@ -32,9 +29,6 @@ def get_p_id(path: Path) -> str:
     res = path.name.split('.nii')[0]
 
     return res
-
-
-import csv
 
 
 def save_slices(IM_path, gt_path,
@@ -124,9 +118,6 @@ def save_slices(IM_path, gt_path,
     return neg, pos, space_dict
 
 
-import os
-
-
 def main(args: argparse.Namespace):
     src_path: Path = Path(args.source_dir)
     dest_path: Path = Path(args.dest_dir)
@@ -193,7 +184,7 @@ def get_args() -> argparse.Namespace:
     parser.add_argument('--source_dir', type=str,
                         default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task04_Hippocampus/Splits/train')
     parser.add_argument('--dest_dir', type=str,
-                        default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task04_Hippocampus/Splits/fold_1')
+                        default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task04_Hippocampus/Splits/csv')
     parser.add_argument('--img_dir', type=str, default="imagesTr")
     parser.add_argument('--gt_dir', type=str, default="labelsTr")
     parser.add_argument('--shape', type=int, nargs="+", default=[256, 256])

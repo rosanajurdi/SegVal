@@ -1,24 +1,24 @@
 #!/usr/env/bin python3.6
 
 import io
-import re
 import random
+import re
+from functools import partial
+from itertools import repeat
 from operator import itemgetter
 from pathlib import Path
-from itertools import repeat
-from functools import partial
+
+import numpy as np
+import torch
+from PIL import Image
+from skimage.transform import resize
+from torch import Tensor
+from torch.utils.data import Dataset, DataLoader, Sampler
+from torchvision import transforms
 from typing import Any, Callable, BinaryIO, Dict, List, Match, Pattern, Tuple, Union, Optional
 
-import torch
-import numpy as np
-from torch import Tensor
-from PIL import Image
-from torchvision import transforms
-from skimage.transform import resize
-from torch.utils.data import Dataset, DataLoader, Sampler
-
 from utils import id_, map_, class2one_hot, one_hot2dist
-from utils import simplex, sset, one_hot
+from utils import one_hot
 
 F = Union[Path, BinaryIO]
 D = Union[Image.Image, np.ndarray, Tensor]

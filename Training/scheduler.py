@@ -1,7 +1,8 @@
 #!/usr/bin/env python3.7
 
-from typing import Any, Callable, List, Tuple
 from operator import add
+
+from typing import Any, Callable, List, Tuple
 
 from utils import map_, uc_
 

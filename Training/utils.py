@@ -1,24 +1,22 @@
 #!/usr/bin/env python3.6
 
-from random import random
-from pathlib import Path
-from multiprocessing.pool import Pool
-
-from typing import Any, Callable, Iterable, List, Set, Tuple, TypeVar, Union
-
-import torch
-import numpy as np
-from tqdm import tqdm
-from torch import einsum
-from torch import Tensor
 from functools import partial
-from skimage.io import imsave
+from multiprocessing.pool import Pool
+from pathlib import Path
+from random import random
+from medpy.metric.binary import hd
+import numpy as np
+import scipy as sp
+import torch
 from PIL import Image, ImageOps
 from scipy.ndimage import distance_transform_edt as distance
 from scipy.spatial.distance import directed_hausdorff
-
-import scipy as sp
-
+from skimage.io import imsave
+from torch import Tensor
+from torch import einsum
+from tqdm import tqdm
+from typing import Any, Callable, Iterable, List, Set, Tuple, TypeVar, Union
+from surface_distance.metrics import compute_robust_hausdorff, compute_surface_distances
 # functions redefinitions
 tqdm_ = partial(tqdm, ncols=175,
                 leave=False,
@@ -213,8 +211,8 @@ def one_hot(t: Tensor, axis=1) -> bool:
 # # Metrics and shitz
 def meta_dice(sum_str: str, label: Tensor, pred: Tensor, smooth: float = 1e-8) -> float:
     assert label.shape == pred.shape
-    assert one_hot(label)
-    assert one_hot(pred)
+    #assert one_hot(label)
+    # assert one_hot(pred)
 
     inter_size: Tensor = einsum(sum_str, [intersection(label, pred)]).type(torch.float32)
     sum_sizes: Tensor = (einsum(sum_str, [label]) + einsum(sum_str, [pred])).type(torch.float32)
@@ -223,10 +221,26 @@ def meta_dice(sum_str: str, label: Tensor, pred: Tensor, smooth: float = 1e-8) -
 
     return dices
 
+def dice_acc_3D(pred, label) -> float:
+    smooth = 1e-8
+    assert label.shape == pred.shape
+    label = torch.tensor(label)
+    pred = torch.tensor(pred)
 
+    pred_one = [class2one_hot(p,3)[0][1:].reshape((1, 2,256,256)) for p in list(pred)]
+    label = [class2one_hot(p,3)[0][1:].reshape((1, 2,256,256)) for p in list(label)]
+    a = [l & p for l, p in zip(pred_one, label)]
+    inter_size = torch.cat(a).sum(axis=[2, 3]).sum(axis=0).type(torch.float32)
+    b = [l + p for l, p in zip(pred_one, label)]
+    sum_sizes: Tensor = torch.cat(pred_one).sum(axis=[2, 3]).sum(axis=0).type(torch.float32) + \
+                        torch.cat(label).sum(axis=[2, 3]).sum(axis=0).type(torch.float32)
+
+    dices: Tensor = ((2 * inter_size) + smooth)/ (sum_sizes+smooth)
+    dices = np.round(dices.numpy(), decimals=4)
+    return dices
 dice_coef = partial(meta_dice, "bcwh->bc")
 dice_batch = partial(meta_dice, "bcwh->c")  # used for 3d dice
-
+dice_coef_3D = partial(meta_dice, "bcwh->c")
 
 def intersection(a: Tensor, b: Tensor) -> Tensor:
     assert a.shape == b.shape
@@ -241,9 +255,102 @@ def union(a: Tensor, b: Tensor) -> Tensor:
     assert sset(b, [0, 1])
     return a | b
 
+def hausdorff_deepmind(preds: Tensor, target: Tensor, spacing: Tensor = None) -> Tensor:
+    assert preds.shape == target.shape
+    target = torch.tensor(target)
+    preds = torch.tensor(preds)
+
+    preds = [class2one_hot(p, 3) for p in list(preds)]
+    target = [class2one_hot(p, 3) for p in list(target)]
+
+    preds = torch.tensor(torch.cat(preds))
+    target = torch.tensor(torch.cat(target))
+
+    assert one_hot(preds)
+    assert one_hot(target)
+
+    B, K, *img_shape = preds.shape
+
+    if spacing is None:
+        D: int = 3
+        spacing = torch.ones((B, D), dtype=torch.float32)
+
+    hdd = []
+    for p, t in zip(np.split(np.array(preds), 3, axis=1), np.split(np.array(target), 3, axis=1)):
+        p = p.squeeze()
+        t = t.squeeze()
+        dictt = compute_surface_distances(mask_gt=np.array(p).astype(np.bool),
+                                      mask_pred=np.array(t).astype(np.bool), spacing_mm=[1,1,1])
+
+        hdd.append(compute_robust_hausdorff(dictt, 95))
+        # print(hdd)
+
+    return np.array(hdd[1:])
+
+def hausdorff_medpy(preds: Tensor, target: Tensor, spacing: Tensor = None) -> Tensor:
+    assert preds.shape == target.shape
+    target = torch.tensor(target)
+    preds = torch.tensor(preds)
+
+    preds = [class2one_hot(p, 3) for p in list(preds)]
+    target = [class2one_hot(p, 3) for p in list(target)]
+
+    preds = torch.tensor(torch.cat(preds))
+    target = torch.tensor(torch.cat(target))
+
+    assert one_hot(preds)
+    assert one_hot(target)
+
+    B, K, *img_shape = preds.shape
+
+    if spacing is None:
+        D: int = len(img_shape)
+        spacing = torch.ones((B, D), dtype=torch.float32)
+
+    assert spacing.shape == (B, len(img_shape))
+
+    res = torch.zeros((B, K), dtype=torch.float32, device=preds.device)
+    n_pred = preds.cpu().numpy()
+    n_target = target.cpu().numpy()
+    n_spacing = spacing.cpu().numpy()
+
+    for b in range(B):
+        # print(spacing[b])
+        # if K == 2:
+        #     res[b, :] = hd(n_pred[b, 1], n_target[b, 1], voxelspacing=n_spacing[b])
+        #     continue
+
+        for k in range(K):
+            if not n_target[b, k].any():  # No object to predict
+                if n_pred[b, k].any():  # Predicted something nonetheless
+                    res[b, k] = sum((dd * d)**2 for (dd, d) in zip(n_spacing[b], img_shape)) ** 0.5
+                    continue
+                else:
+                    res[b, k] = 0
+                    continue
+            if not n_pred[b, k].any():
+                if n_target[b, k].any():
+                    res[b, k] = sum((dd * d)**2 for (dd, d) in zip(n_spacing[b], img_shape)) ** 0.5
+                    continue
+                else:
+                    res[b, k] = 0
+                    continue
+
+            res[b, k] = hd(n_pred[b, k], n_target[b, k], voxelspacing=n_spacing[b])
+
+    return res
 
 def haussdorf(preds: Tensor, target: Tensor) -> Tensor:
     assert preds.shape == target.shape
+    target = torch.tensor(target)
+    preds = torch.tensor(preds)
+
+    preds = [class2one_hot(p, 3) for p in list(preds)]
+    target = [class2one_hot(p, 3) for p in list(target)]
+
+    preds = torch.tensor(torch.cat(preds))
+    target = torch.tensor(torch.cat(target))
+
     assert one_hot(preds)
     assert one_hot(target)
 

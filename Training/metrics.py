@@ -1,16 +1,16 @@
 #!/usr/bin/env python3.6
 
 import argparse
-from typing import List
-from pathlib import Path
 from functools import partial
 from operator import itemgetter
+from pathlib import Path
 
-import torch
 import numpy as np
+import torch
 from torch import Tensor
-from torchvision import transforms
 from torch.utils.data import DataLoader
+from torchvision import transforms
+from typing import List
 
 from dataloader import SliceDataset, PatientSampler
 from utils import map_, tqdm_, dice_batch, dice_coef, class2one_hot, simplex, sset
