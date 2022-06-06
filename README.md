@@ -12,4 +12,17 @@ The repository is composed of 4 sub-directories:
 - Confidence_Intervals: generates the confidence intervals over the adopted metrics.
 
 
-# 
+# Data_Preprocessing: 
+This directory is mainly dedicated to two functionalities: 1) splitting the datasets to folds and 2) converting the data to numpy and preprocessing them. 
+
+## splitting the datasets to folds
+## converting the data to numpy
+```
+'--source_dir': the directory to find the nifty data                  
+'--dest_dir': the directory to store the npy data                 
+'--shape': reshaoing the data by defualt is  default=[256, 256]
+'--retain': "Number of retained patient for the validation data in our code it is set to default=0 since we are pre-identifying the folds in a seperate script"
+'--type': the type of folds you are constructing could be "val or test", in case val it converts both train and validation folders, in case test it ony cnverts the test file to numpy 
+'--discard_negatives' set to  default=False since we want all the slices in the dataset empty and full. 
+```
+
