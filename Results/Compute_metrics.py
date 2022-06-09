@@ -30,7 +30,7 @@ plt.show()
 #prediction_dir = os.path.join(root_dir, 'predictions_npy' )
 #gt_dir = os.path.join(root_dir, 'gt_npy' )
 
-prediction_dir = '/Users/rosana.eljurdi/PycharmProjects/SegVal_Project/Results/predictions_npy'
+prediction_dir = '/Results/Hippo/predictions_npy'
 gt_dir = '/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task04_Hippocampus/Splits/test/test_npy/gt_npy'
 
 
@@ -78,10 +78,10 @@ import matplotlib.cm as cm
 script that reads the npy results and generates the result.csv files wirh patient dice accuracies.
 '''
 
-fold_all_H1 = open('/Users/rosana.eljurdi/PycharmProjects/SegVal_Project/Results/csv/results-dice.csv', "w")
+fold_all_H1 = open('/Results/Hippo/csv/results-dice.csv', "w")
 fold_all_H1.write(f"file, metric \n")
 
-fold_all_H2 = open('/Users/rosana.eljurdi/PycharmProjects/SegVal_Project/Results/csv/results-hauss.csv', "w")
+fold_all_H2 = open('/Results/Hippo/csv/results-hauss.csv', "w")
 fold_all_H2.write(f"file,metric\n")
 for patient in patient_ids:
     path = Path(prediction_dir)

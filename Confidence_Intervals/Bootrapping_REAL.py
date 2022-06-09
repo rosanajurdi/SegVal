@@ -35,7 +35,7 @@ def draw_bs_replicates(data, func, size):
     return bs_replicates
 import os
 # Import the iris dataset
-root_path = '/Users/rosana.eljurdi/PycharmProjects/SegVal_Project/Results/csv/results-hauss.csv'
+root_path = '/Results/Hippo/csv/results-hauss.csv'
 data = pd.read_csv(root_path)
 if 'dice' in os.path.basename(root_path) :
     data[' metric '] *=100

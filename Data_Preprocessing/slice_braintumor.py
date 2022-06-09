@@ -1,5 +1,10 @@
 #!/usr/bin/env python3.6
+'''
+scriot that transforms the files to npy
 
+
+
+'''
 import argparse
 from functools import partial
 from pathlib import Path
@@ -256,19 +261,19 @@ def main(args: argparse.Namespace):
 
 def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Slicing parameters')
-
     parser.add_argument('--source_dir', type=str,
-                        default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task01_BrainTumour/Splits/train/fold_3')
+                        default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task01_BrainTumour/Splits')
     parser.add_argument('--dest_dir', type=str,
-                        default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task01_BrainTumour/Splits/train/fold_3/npy')
+                        default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task01_BrainTumour/Splits/test_npy')
     parser.add_argument('--img_dir', type=str, default="IMG")
     parser.add_argument('--gt_dir', type=str, default="GT")
     parser.add_argument('--shape', type=int, nargs="+", default=[256, 256])
     parser.add_argument('--retain', type=int, default=0, help="Number of retained patient for the validation data")
-    parser.add_argument('--type', type=str, default='val', help="val or test")
+    parser.add_argument('--type', type=str, default='test', help="val or test")
     parser.add_argument('--n_augment', type=int, default=0,
                         help="Number of augmentation to create per image, only for the training set")
     parser.add_argument('--discard_negatives', action='store_true', default=False)
+
     args = parser.parse_args()
 
     print(args)

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3.6
 '''
 Script to compute metrics : Dice accuracy, hausdorf distance and the error on the number of connected components.
+Old script do not use
 '''
 
 import torch.nn.functional as F
@@ -13,8 +14,8 @@ import os
 
 from utils import dice_coef, haussdorf, probs2one_hot, class2one_hot
 
-root='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task04_Hippocampus/Splits/test_npy'
-net_path = '../Results/csv/best2.pkl'
+root='/'
+net_path = ''
 
 net = torch.load(net_path, map_location=torch.device('cpu'))
 n_classes = 3
@@ -24,7 +25,7 @@ fieldnames = ['SLICE_ID', 'dice','haus']
 
 #assert os.path.exists(os.path.join(net_path.split(os.path.basename(net_path))[0], 'predictions'))== False
 
-exp_path = net_path.split('/best2.pkl')[0] #Include the name of the checkpoint you want to use
+exp_path = net_path.split('/best2-f2.pkl')[0] #Include the name of the checkpoint you want to use
 name =os.path.basename(exp_path)
 folder_path = Path(exp_path, 'CSV_RESULTS')
 
