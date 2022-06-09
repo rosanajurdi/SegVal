@@ -1,0 +1,43 @@
+# Python and system files
+build/
+dist/
+env/
+tests/data
+examples/external-data
+clinicadl.egg-info
+*egg-info
+*.log
+*.pyc
+*.o
+*.lib
+*.sys
+*.so
+.DS_Store
+*.swp
+
+# Editor's files
+.idea
+.vscode
+.env
+
+# Code coverage and crash log files
+.coverage
+crash*
+
+# Pytest files
+.pytest_cache/
+tests/data/models
+tests/data/dataset
+tests/data/tsvtool_test
+tests/data/labels_list
+tests/results
+tests/data/reproducibility
+
+# Notebook jupyter
+.ipynb_checkpoints/
+clinicadl/notebooks/
+
+# Mask and other files
+logs/
+errors/
+._*
