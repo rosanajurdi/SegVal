@@ -19,7 +19,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 
-prediction_dir = '/Results/Hippo/predictions_npy'
+prediction_dir = '/Results_old/Hippo/predictions_npy'
 gt_dir = '/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task04_Hippocampus/Splits/test/test_npy/gt_npy'
 
 df_dice = pd.DataFrame()

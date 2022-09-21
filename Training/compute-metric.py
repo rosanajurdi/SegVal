@@ -93,13 +93,13 @@ for patient in patient_ids:
     Volume_3D_pred = [fix_it(np.load(p)[0]) for p in pred_paths]
     '''
     for slice, file in zip(*[Volume_3D_pred, basenames]):
-        plt.imsave(os.path.join('../Results/predictions_img','{}.png'.format(file.split('.npy')[0]) ), slice )
+        plt.imsave(os.path.join('../Results_old/predictions_img','{}.png'.format(file.split('.npy')[0]) ), slice )
     '''
     gt_paths: List[Path] = list(path.rglob('{}_*'.format(patient)))
     Volume_3D_gt = [np.load(os.path.join(gt_dir, p)) for p in basenames]
     '''
     for slice, file in zip(*[Volume_3D_gt, basenames]):
-        plt.imsave(os.path.join('../Results/gt_img','{}.png'.format(file.split('.npy')[0])), slice)
+        plt.imsave(os.path.join('../Results_old/gt_img','{}.png'.format(file.split('.npy')[0])), slice)
     '''
 
     dice = dice_acc_3D(np.array(Volume_3D_pred),

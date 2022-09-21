@@ -221,14 +221,15 @@ def meta_dice(sum_str: str, label: Tensor, pred: Tensor, smooth: float = 1e-8) -
 
     return dices
 
-def dice_acc_3D(pred, label) -> float:
+def dice_acc_3D(pred, label, n) -> float:
     smooth = 1e-8
     assert label.shape == pred.shape
     label = torch.tensor(label)
     pred = torch.tensor(pred)
+    s=label.shape[-1]
 
-    pred_one = [class2one_hot(p,3)[0][1:].reshape((1, 2,256,256)) for p in list(pred)]
-    label = [class2one_hot(p,3)[0][1:].reshape((1, 2,256,256)) for p in list(label)]
+    pred_one = [class2one_hot(p,n+1)[0][1:].reshape((1, n,s,s)) for p in list(pred)]
+    label = [class2one_hot(p,n+1)[0][1:].reshape((1, n,s,s)) for p in list(label)]
     a = [l & p for l, p in zip(pred_one, label)]
     inter_size = torch.cat(a).sum(axis=[2, 3]).sum(axis=0).type(torch.float32)
     b = [l + p for l, p in zip(pred_one, label)]
@@ -255,13 +256,13 @@ def union(a: Tensor, b: Tensor) -> Tensor:
     assert sset(b, [0, 1])
     return a | b
 
-def hausdorff_deepmind(preds: Tensor, target: Tensor, spacing: Tensor = None) -> Tensor:
+def hausdorff_deepmind(preds: Tensor, target: Tensor, spacing: Tensor = None, n: int = None) -> Tensor:
     assert preds.shape == target.shape
-    target = torch.tensor(target)
-    preds = torch.tensor(preds)
+    target = torch.tensor(target) # should be slice -class -shape
+    preds = torch.tensor(preds) # should be slice -class -shape
 
-    preds = [class2one_hot(p, 3) for p in list(preds)]
-    target = [class2one_hot(p, 3) for p in list(target)]
+    preds = [class2one_hot(p, n) for p in list(preds)]
+    target = [class2one_hot(p, n) for p in list(target)]
 
     preds = torch.tensor(torch.cat(preds))
     target = torch.tensor(torch.cat(target))
@@ -276,7 +277,7 @@ def hausdorff_deepmind(preds: Tensor, target: Tensor, spacing: Tensor = None) ->
         spacing = torch.ones((B, D), dtype=torch.float32)
 
     hdd = []
-    for p, t in zip(np.split(np.array(preds), 3, axis=1), np.split(np.array(target), 3, axis=1)):
+    for p, t in zip(np.split(np.array(preds), n, axis=1), np.split(np.array(target), n, axis=1)):
         p = p.squeeze()
         t = t.squeeze()
         dictt = compute_surface_distances(mask_gt=np.array(p).astype(np.bool),

@@ -2,6 +2,8 @@
 build/
 dist/
 env/
+draft/
+debug_*/
 tests/data
 examples/external-data
 clinicadl.egg-info
@@ -14,6 +16,7 @@ clinicadl.egg-info
 *.so
 .DS_Store
 *.swp
+*.pkl
 
 # Editor's files
 .idea

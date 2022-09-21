@@ -238,7 +238,7 @@ def run(args: argparse.Namespace) -> None:
                 f.write(':')
                 f.write(str(best_dice_2))
 
-            torch.save(net, Path(savedir, "best2.pkl"))
+            torch.save(net, Path(savedir, "best2-f2.pkl"))
 
 
         optimizer, loss_fns, loss_weights = scheduler(i, optimizer, loss_fns, loss_weights)
@@ -264,7 +264,7 @@ def get_args() -> argparse.Namespace:
     parser.add_argument("--cpu", action='store_true', default = False)
     parser.add_argument("--debug", action="store_true", default = False)
     parser.add_argument("--modalities", type=int, default=4)
-    parser.add_argument("--weights", type=str, default='/network/lustre/iss02/aramis/users/rosana.eljurdi/Validation_Project/BrainTumor/fold_1/results_500_2/best2.pkl', help="Stored weights to restore")
+    parser.add_argument("--weights", type=str, default='/network/lustre/iss02/aramis/users/rosana.eljurdi/Validation_Project/BrainTumor/fold_1/results_500_2/best2-f2.pkl', help="Stored weights to restore")
     parser.add_argument('--n_epoch', nargs='?', type=int, default=500,
                         help='# of the epochs')
     parser.add_argument('--l_rate', nargs='?', type=float, default=0.001,

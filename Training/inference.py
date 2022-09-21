@@ -19,10 +19,10 @@ import csv
 
 from utils import dice_coef, dice_batch, save_images, tqdm_, haussdorf, probs2one_hot, class2one_hot, numpy_haussdorf
 root='/network/lustre/iss02/aramis/users/rosana.eljurdi/Validation_Project/Hippocampus/test_npy'
-net_path = '/network/lustre/iss02/aramis/users/rosana.eljurdi/Validation_Project/BrainTumor/Task01_BrainTumour/fold_2/results_500_/best2.pkl'
+net_path = '/network/lustre/iss02/aramis/users/rosana.eljurdi/Validation_Project/BrainTumor/Task01_BrainTumour/fold_2/results_500_/best2-f2.pkl'
 
 root = '/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task01_BrainTumour/Splits/test_npy/test_npy'
-net_path = '../Results/Brain/best2-f2.pkl'
+net_path = '../Results_old/Brain/best2-f2.pkl'
 
 net = torch.load(net_path, map_location=torch.device('cpu'))
 n_classes = 4

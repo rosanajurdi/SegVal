@@ -238,7 +238,7 @@ def run(args: argparse.Namespace) -> None:
                 f.write(':')
                 f.write(str(best_dice_2))
 
-            torch.save(net, Path(savedir, "best2.pkl"))
+            torch.save(net, Path(savedir, "best2-f2.pkl"))
 
 
         optimizer, loss_fns, loss_weights = scheduler(i, optimizer, loss_fns, loss_weights)

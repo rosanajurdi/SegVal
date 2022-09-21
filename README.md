@@ -26,3 +26,9 @@ This directory is mainly dedicated to two functionalities: 1) splitting the data
 '--discard_negatives' set to  default=False since we want all the slices in the dataset empty and full. 
 ```
 
+# Simulation:
+# Inference: 
+the metrics exploited for the evaluation are the dice accuracy and the haussdorf distance. 
+
+# notes: 
+ rn i cannot do any visualization scripts via the server since it is very lagging. so 
