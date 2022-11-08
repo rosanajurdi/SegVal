@@ -56,6 +56,7 @@ class UNet(nn.Module):
                                     convBatch(nG * 8, nG * 8))
 
         self.deconv1 = upSampleConv(nG * 8, nG * 8)
+
         self.conv5 = nn.Sequential(convBatch(nG * 12, nG * 4),
                                    convBatch(nG * 4, nG * 4))
         self.deconv2 = upSampleConv(nG * 4, nG * 4)

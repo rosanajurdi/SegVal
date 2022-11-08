@@ -37,7 +37,7 @@ def draw_bs_replicates(data, func, size):
     return bs_replicates
 import os
 # Import the iris dataset
-root_path = '/Users/rosana.eljurdi/PycharmProjects/SegVal_Project/Stats/Test/fold_3/results-dice-3D.csv'
+root_path = '/Stats/Hippocampus_dataset/Test/fold_3/my_name.csv'
 data = pd.read_csv(root_path)
 
 # Analytical values:
@@ -83,7 +83,7 @@ def draw_bs_replicates(data, func, size):
     return bs_replicates
 import os
 # Import the iris dataset
-root_path = '/Users/rosana.eljurdi/PycharmProjects/SegVal_Project/Stats/Test/fold_3/results-dice-3D.csv'
+root_path = '/Stats/Hippocampus_dataset/Test/fold_3/my_name.csv'
 data = pd.read_csv(root_path)
 
 # Analytical values:
