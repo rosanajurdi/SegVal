@@ -1,5 +1,9 @@
 #!/usr/bin/env python3.6
+"""
+The code makes the assumption that the val, train and test are already present.
 
+
+"""
 import argparse
 import warnings
 from functools import partial
@@ -126,25 +130,24 @@ import os
 
 def main(args: argparse.Namespace):
     if args.type == 'test':
-        train_path: Path = Path(os.path.join(args.source_dir, 'train', 'root'))
+        train_path: Path = Path(os.path.join(args.source_dir, 'train'))
         val_path: Path = Path(os.path.join(args.source_dir, 'test'))
     elif args.type == 'val':
         train_path: Path = Path(os.path.join(args.source_dir, 'train'))
         val_path: Path = Path(os.path.join(args.source_dir, 'val'))
 
-
-
     dest_path: Path = Path(args.dest_dir)
 
     # Assume the cleaning up is done before calling the script
     assert train_path.exists() and val_path.exists()
-    assert not dest_path.exists()
+    if args.type == 'val':
+        assert not dest_path.exists()
 
     # Get all the file names, avoid the temporal ones in the training directory
     all_paths_train: List[Path] = list(train_path.rglob('*.nii.gz'))
     nii_paths_train: List[Path] = [p for p in all_paths_train if "_4D" not in str(p)]
     assert len(nii_paths_train) % 2 == 0, "Number of .nii not multiple of 6, some pairs are broken"
-
+    assert len(nii_paths_train) / 2 == 100 # make sure that the training data length is 150
     # Get all the file names, avoid the temporal ones in the validation directory
     all_paths_val: List[Path] = list(val_path.rglob('*.nii.gz'))
     nii_paths_val: List[Path] = [p for p in all_paths_val if "_4D" not in str(p)]
@@ -162,18 +165,24 @@ def main(args: argparse.Namespace):
     assert len(IMG_nii_paths_val) == len(gt_nii_paths_val)
     paths_val: List[Tuple[Path, ...]] = list(zip(IMG_nii_paths_val, gt_nii_paths_val))
 
-    print(f"Found training {len(IMG_nii_paths_train)} pairs in total")
-    pprint(paths_train[:2])
+    print(f"Found  {len(IMG_nii_paths_train)} pairs in total for training")
+    #pprint(paths_train[:2])
 
-    print(f"Found training {len(IMG_nii_paths_val)} pairs in total")
-    pprint(paths_val[:2])
+    print(f"Found  {len(IMG_nii_paths_val)} pairs in total for {args.type}")
+    #pprint(paths_val[:2])
 
     validation_paths: List[Tuple[Path, ...]] = [p for p in paths_val]
     training_paths: List[Tuple[Path, ...]] = [p for p in paths_train]
     assert set(validation_paths).isdisjoint(set(training_paths))
     # len(paths) == (len(validation_paths) + len(training_paths))
+    if args.type == 'val':
+        listt = ["train", args.type]
+        paths = [training_paths, validation_paths]
+    elif args.type == 'test':
+        listt = [args.type]
+        paths = [validation_paths]
 
-    for mode, _paths, n_augment in zip(["train", "val"], [training_paths, validation_paths], [args.n_augment, 0]):
+    for mode, _paths, n_augment in zip(listt, paths, [args.n_augment, 0]):
 
         three_paths = list(zip(*_paths))
 
@@ -199,16 +208,19 @@ def main(args: argparse.Namespace):
 
 def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Slicing parameters')
-
     parser.add_argument('--source_dir', type=str,
-                        default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task04_Hippocampus/Splits/train/fold_3')
+                        default='/Users/rosana.eljurdi/Documents/Projects/Conf_Seg/Task-hippo-test')
     parser.add_argument('--dest_dir', type=str,
-                        default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task04_Hippocampus/Splits/train/fold_3/npy')
+                        default='/Users/rosana.eljurdi/Documents/Projects/Conf_Seg/Task-hippo-test/nifty/csv')
+    #parser.add_argument('--source_dir', type=str,
+    #                    default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task04_Hippocampus/Splits/train/fold_3')
+    #parser.add_argument('--dest_dir', type=str,
+    #                    default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task04_Hippocampus/Splits/train/fold_3/npy')
     parser.add_argument('--img_dir', type=str, default="IMG")
     parser.add_argument('--gt_dir', type=str, default="GT")
     parser.add_argument('--shape', type=int, nargs="+", default=[256, 256])
-    parser.add_argument('--retain', type=int, default=0, help="Number of retained patient for the validation data")
-    parser.add_argument('--type', type=str, default='val', help="val or test")
+    parser.add_argument('--retain', type=int, default=50, help="Number of retained patient for the validation data")
+    parser.add_argument('--type', type=str, default='test', help="val or test")
     parser.add_argument('--n_augment', type=int, default=0,
                         help="Number of augmentation to create per image, only for the training set")
     parser.add_argument('--discard_negatives', action='store_true', default=False)

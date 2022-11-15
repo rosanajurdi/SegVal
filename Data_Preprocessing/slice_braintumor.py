@@ -187,7 +187,7 @@ import os
 
 def main(args: argparse.Namespace):
     if args.type == 'test':
-        train_path: Path = Path(os.path.join(args.source_dir, 'train', 'root'))
+        train_path: Path = Path(os.path.join(args.source_dir, 'train'))
         val_path: Path = Path(os.path.join(args.source_dir, 'test'))
     elif args.type == 'val':
         train_path: Path = Path(os.path.join(args.source_dir, 'train'))
@@ -199,7 +199,8 @@ def main(args: argparse.Namespace):
 
     # Assume the cleaning up is done before calling the script
     assert train_path.exists() and val_path.exists()
-    assert not dest_path.exists()
+    if args.type == 'val':
+        assert not dest_path.exists()
 
     # Get all the file names, avoid the temporal ones in the training directory
     all_paths_train: List[Path] = list(train_path.rglob('*.nii.gz'))
@@ -233,8 +234,14 @@ def main(args: argparse.Namespace):
     training_paths: List[Tuple[Path, ...]] = [p for p in paths_train]
     assert set(validation_paths).isdisjoint(set(training_paths))
     # len(paths) == (len(validation_paths) + len(training_paths))
+    if args.type == 'val':
+        listt = ["train", args.type]
+        paths = [training_paths, validation_paths]
+    elif args.type == 'test':
+        listt = [args.type]
+        paths = [validation_paths]
 
-    for mode, _paths, n_augment in zip(["train", args.type], [training_paths, validation_paths], [args.n_augment, 0]):
+    for mode, _paths, n_augment in zip(listt, paths, [args.n_augment, 0]):
 
         three_paths = list(zip(*_paths))
 
@@ -261,10 +268,14 @@ def main(args: argparse.Namespace):
 
 def get_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description='Slicing parameters')
+    #parser.add_argument('--source_dir', type=str,
+    #                    default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task01_BrainTumour/Splits')
+    #parser.add_argument('--dest_dir', type=str,
+    #                    default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task01_BrainTumour/Splits/test_npy')
     parser.add_argument('--source_dir', type=str,
-                        default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task01_BrainTumour/Splits')
+                  default='/Users/rosana.eljurdi/Documents/Projects/Conf_Seg/bt-test')
     parser.add_argument('--dest_dir', type=str,
-                        default='/Users/rosana.eljurdi/Documents/Confidence_Intervals_Olivier/Task01_BrainTumour/Splits/test_npy')
+                        default='/Users/rosana.eljurdi/Documents/Projects/Conf_Seg/bt-test/npy')
     parser.add_argument('--img_dir', type=str, default="IMG")
     parser.add_argument('--gt_dir', type=str, default="GT")
     parser.add_argument('--shape', type=int, nargs="+", default=[256, 256])

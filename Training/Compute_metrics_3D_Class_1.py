@@ -1,48 +1,33 @@
 '''
 @author: eljurros
 
-Note that the current deep mind implementation of the haussdorf loss behaves as following: 
+Note that the current deep mind implementation of the haussdorf loss behaves as following:
 If one of the masks is empty, the corresponding lists are empty and all distances in
-  the other list are `inf`. 
+  the other list are `inf`.
 
 For the time being I will discard the inf until I find a suitable solution.
 '''
 import pandas as pd
-from mpl_toolkits.mplot3d.art3d import Poly3DCollection
-from skimage import measure
 df_all = []
 from pathlib import Path
 import os
 import sys
-sys.path.append('/network/lustre/iss02/aramis/users/rosana.eljurdi/SegVal_Project/Training')
 from typing import List
-from utils import dice_coef, class2one_hot, dice_acc_3D, haussdorf, hausdorff_deepmind
 from surface_distance import metrics
 import torch
-import nibabel as nib
 
-import numpy as np
-from matplotlib import pyplot as plt
-'''
-plt.rcParams["figure.figsize"] = [7.00, 3.50]
-plt.rcParams["figure.autolayout"] = True
-data2D = np.random.random((50, 50))
-im = plt.imshow(data2D, cmap="copper_r")
-plt.colorbar(im)
-plt.show()
-'''
 
 #prediction and ground-truth directories:
 root_path = '/Users/rosana.eljurdi/Documents/Projects/Conf_Seg/Confidence_Intervals_Olivier/Task04_Hippocampus/Splits/test/test_npy'
 fold_path = os.path.join(root_path, '')
-#prediction and ground-truth directories: 
+#prediction and ground-truth directories:
 prediction_dir = os.path.join(fold_path,'fold_3/predictions_npy')
 gt_dir = os.path.join(root_path,'gt_npy')
 
-fold_all_H1 = open(os.path.join(fold_path,'results-Dice-3D-class-2.csv'), "w")
+fold_all_H1 = open(os.path.join(fold_path,'results-Dice-3D-L1.csv'), "w")
 fold_all_H1.write(f"file, metric \n")
 
-fold_all_H2 = open(os.path.join(fold_path,'results-hauss-3D-class-2.csv'), "w")
+fold_all_H2 = open(os.path.join(fold_path,'results-hauss-3D-L1.csv'), "w")
 fold_all_H2.write(f"file,metric\n")
 
 df_dice = pd.DataFrame()
@@ -84,22 +69,22 @@ key = patient_ids[0].split('_')[0]
 #assert ds_length[key] == len(patient_ids)  # assertin command to make sure that the patient numbers are conserved
 
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.cm as cm
+
 '''
 
 script that reads the npy results and generates the result.csv files wirh patient dice accuracies.
 '''
 
-
+assert len(np.unique(patient_ids)) ==  ds_length[key]
 for patient in patient_ids:
     path = Path(prediction_dir)
     pred_paths: List[Path] = list(path.rglob('{}_*'.format(patient)))
     basenames = [p.name for p in pred_paths]
 
     Volume_3D_pred_multi = [fix_it(np.load(p)[0]) for p in pred_paths]
-    #Volume_3D_pred = np.array([np.where(a == 1, 0, a) for a in Volume_3D_pred_multi])
-    Volume_3D_pred = np.array([np.where(a == 2, 1, a) for a in Volume_3D_pred_multi])
+    Volume_3D_pred = np.array([np.where(a == 2, 0, a) for a in Volume_3D_pred_multi]) # Choosing the first region L1
+    assert len(np.unique(Volume_3D_pred)) == 2
+    Volume_3D_pred = Volume_3D_pred.astype(bool) # transforming to boolean
 
     '''
     for slice, file in zip(*[Volume_3D_pred, basenames]):
@@ -107,23 +92,26 @@ for patient in patient_ids:
     '''
     gt_paths: List[Path] = list(path.rglob('{}_*'.format(patient)))
 
-    Volume_3D_gt_multi = [np.load(os.path.join(gt_dir, p)) for p in basenames]
-    #Volume_3D_gt = np.array([np.where(a == 1, 0, a) for a in Volume_3D_gt_multi])
-    Volume_3D_gt = np.array([np.where(a == 2, 1, a) for a in Volume_3D_gt_multi])
 
+
+    Volume_3D_gt_multi = [np.load(os.path.join(gt_dir, p)) for p in basenames]
+    Volume_3D_gt = np.array([np.where(a == 2, 0, a) for a in Volume_3D_gt_multi])  # Choosing the first region L1
+    Volume_3D_gt = Volume_3D_gt.astype(bool) # transforming to boolean
 
     #dice = dice_acc_3D(np.array(Volume_3D_pred),
     #                   np.array(Volume_3D_gt), 2)
 
     dice = np.round(metrics.compute_dice_coefficient(Volume_3D_gt, Volume_3D_pred)*100,2)
 
-    fold_all_H1.write(f"{patient}, {np.round((dice), 2)} \n")
-    print(np.round((dice), 2))
-    #sf = metrics.compute_surface_distances(np.array(Volume_3D_pred),
-    #             np.array(Volume_3D_gt), [1,1])
-    #hd = metrics.compute_robust_hausdorff(sf)
-    #fold_all_H2.write(f"{patient}, {np.float(hd.mean())} \n")
-    #print(patient, dice.mean(), hd.mean())
+    fold_all_H1.write(f"{patient}, {np.round(dice, 2)} \n")
+
+    sf = metrics.compute_surface_distances(np.array(Volume_3D_pred),
+                 np.array(Volume_3D_gt), [1,1, 1]) # 1mm^^ corresponding to  mm spacing
+
+    hd = metrics.compute_robust_hausdorff(sf, 95)
+
+    fold_all_H2.write(f"{patient}, {np.round(hd, 2)} \n")
+    print(patient, np.round(dice, 2), np.round(hd, 2))
 
 
 

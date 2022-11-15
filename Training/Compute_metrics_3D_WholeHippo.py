@@ -109,19 +109,11 @@ for patient in patient_ids:
     Volume_3D_gt_multi = [np.load(os.path.join(gt_dir, p)) for p in basenames]
     Volume_3D_gt = np.array([np.where(a == 2, 1, a) for a in Volume_3D_gt_multi])
 
-
-    #dice = dice_acc_3D(np.array(Volume_3D_pred),
-    #                   np.array(Volume_3D_gt), 2)
-
     dice = np.round(metrics.compute_dice_coefficient(Volume_3D_gt, Volume_3D_pred)*100,2)
 
     fold_all_H1.write(f"{patient}, {np.round((dice), 2)} \n")
     print(np.round((dice), 2))
-    #sf = metrics.compute_surface_distances(np.array(Volume_3D_pred),
-    #             np.array(Volume_3D_gt), [1,1])
-    #hd = metrics.compute_robust_hausdorff(sf)
-    #fold_all_H2.write(f"{patient}, {np.float(hd.mean())} \n")
-    #print(patient, dice.mean(), hd.mean())
+
 
 
 
