@@ -62,7 +62,7 @@ please check the code documentation for further information.
 ## Computing Metrics:  
 The script for the ISBI Paper on the whole hippocampus is [Compute_metric_3D_WholeHippo]().
 The input to this script is mainly the path to the 2D gt_npy and prediction directories. The script gathers the 2D slices in both gt and 
-prediction directories and computes the 3D performance metrics : Dice and 95% hausdorff. In the ISBI paper, the hippocampus is considered 
+prediction directories and computes the 3D performance metrics : Dice. In the ISBI paper, the hippocampus is considered 
 as a whole entity, therefore, both classes are merged into one and the PMs are computed for the whole hippocampus. 
 
 You can also check [Compute_metric_3D]() to calculate the PMs of each region independently. Please check the code documentation for
