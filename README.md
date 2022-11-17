@@ -1,6 +1,6 @@
 # SegVal_Project
 This is a directory that contains the code used to realize the paper:  ["HOW PRECISE ARE PERFORMANCE ESTIMATES FOR TYPICAL MEDICAL IMAGE
-SEGMENTATION TASKS?"](https://github.com/rosanajurdi/SegVal/edit/master). The directory is mainly composed of 3 parts: S1 - The data pre-processing part, 
+SEGMENTATION TASKS?"](https://arxiv.org/abs/2210.14677). The directory is mainly composed of 3 parts: S1 - The data pre-processing part, 
 S2- the training part ( which is the state-of-the-art code found in [repository](https://github.com/LIVIAETS/boundary-loss) and S3) the Confidence interval package 
 resposible for generating the statistical evaluation and tables in the paper. 
 
