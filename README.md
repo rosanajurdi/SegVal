@@ -17,7 +17,8 @@ The repository is composed of 4 sub-directories:
 
 # Preprocessing
 The data was split into 100 samples for training, 50 for validation and the rest for testing. The training, testing and validation patients can be found
-in the following text files: [train file](), [test file](), and [val file](). Note that the data structure needs to be of the following format. 
+in the following text files: [train file](./Data_Preprocessing/train.txt), [test file](./Data_Preprocessing/test.txt), 
+and [val file](./Data_Preprocessing/val.txt). Note that the data structure needs to be of the following format. 
 
 ```
 Directory-path-to-data/
@@ -41,7 +42,7 @@ Directory-path-to-data/
 The script assumes that the splits of the data into train, test and val is already done. It will produce an error if the paths to the 
 data was false. The script needs to be run twice: once with --args.type == val and a second time with --args.type == 'test'. 
 Note that val needs to be before test else the code will throw an assertion error.  There are two scripts one for the Hipppocampus dataset
-[slice_decathlon]() and [slice_braintumor]().
+[slice_decathlon](./Data_Preprocessing/slice_decathlon.py) and [slice_braintumor](./Data_Preprocessing/slice_braintumor.py).
 
 ```
 '--source_dir': the directory to find the nifty data having train, test and val                
@@ -55,29 +56,31 @@ Note that val needs to be before test else the code will throw an assertion erro
 # Training: 
 ## main training script for the dataset: 
 
-Replica of [](), please check the code documentation for further information. 
+Replica of [Boundary loss repository](https://github.com/LIVIAETS/boundary-loss), but with Dice loss baseline code. 
+please check the code documentation for further information. 
 ## Inference: 
 please check the code documentation for further information.
 
 ## Computing Metrics:  
-The script for the ISBI Paper on the whole hippocampus is [Compute_metric_3D_WholeHippo]().
+The script for the ISBI Paper on the whole hippocampus is [Compute_metric_3D_WholeHippo](./Training/Compute_metrics_3D_WholeHippo.py).
 The input to this script is mainly the path to the 2D gt_npy and prediction directories. The script gathers the 2D slices in both gt and 
 prediction directories and computes the 3D performance metrics : Dice. In the ISBI paper, the hippocampus is considered 
 as a whole entity, therefore, both classes are merged into one and the PMs are computed for the whole hippocampus. 
 
-You can also check [Compute_metric_3D]() to calculate the PMs of each region independently. Please check the code documentation for
+You can also check [Compute_metric_3D](./Training/Compute_metrics_3D.py) to calculate the PMs of each region independently. 
+Please check the code documentation for
 further information.
 
 # Confidence Intervals: 
 
-To compute the confidence intervals, you need to check the following [sub directory]() and the [main.py](). The code here is 
+To compute the confidence intervals, you need to check the following [sub directory](./Confidence_Intervals) and the [main.py](./Confidence_Intervals/main.py). The code here is 
 fully monotone as you only need to specify some initial parameters at the begining and all the tables are then generated. 
 The code computes the 3D average PM in table 1 of the paper; the corresponding Gaussian values in table 3 both analytical and 
 bootstrapping values as in table 2. The code saves these values in txt files in a format compatible with overleaf so you 
 can directly copy and paste it into your overleaf project. 
 
 The code will also generate the sub-samples csv file which contains the analytical and bootstrap values depending on 
-parameter k. All these files are saved in the [Stats]() directory under a sub-directory having the following name format:
+parameter k. All these files are saved in the [Stats](./Stats) directory under a sub-directory having the following name format:
 ```
 subsampled-stats-{PM}-{datasetname}-MonthDateTime
 ```
