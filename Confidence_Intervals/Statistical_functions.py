@@ -7,13 +7,14 @@ from datetime import date
 
 def statistical_analysis(df):
     "function that getd as input a pandas dataframe and produced some statistical values:"
-    mean = np.round(df.mean().values[0], 4) # get the mean of the sample of size k
-    std = np.round(df.std().values[0], 4) # get the standard deviation of the sample of size k
-    SEM = np.round(std / np.sqrt(len(df)), 4)
-    w = 2*1.96*SEM
-    print(str(mean) + "&" + str(std) + "&" + str(SEM) + "&" + str(w))
+    mean = np.round(df.mean().values[0], 3) # get the mean of the sample of size k
+    std = np.round(df.std().values[0], 3) # get the standard deviation of the sample of size k
+    SEM = np.round(np.float(std) / np.sqrt(len(df)),3)
+    w = np.round(2*1.96*np.float(std) / np.sqrt(len(df)), 3)
+    CI = [mean - 1.96*SEM, mean + 1.96*SEM]
+    #print(str(mean) + "&" + str(std) + "&" + str(SEM) + "&" + str("[{} , {}]".format(-w/2.0, w/2.0)) + "&" )
 
-    return mean, std, SEM, w
+    return mean, std, SEM, w, CI
 
 def create_subsampling_data(K_samples, data, save_dir, name, metric_name):
     """
@@ -49,15 +50,16 @@ def create_subsampling_data(K_samples, data, save_dir, name, metric_name):
         for j in tqdm(range(0,100)): # the experiment needs to be repeated a 100 times since in small samples the values will highly depend on sampled data.
 
             dice_acccuracies_Skj = data['metric'].sample(k) #N samples were selected without replacement
-
+            assert len(dice_acccuracies_Skj) == k
             # Statistical Analysis of the sub samples
             # get the mean & standard deviation of the sample of size k
 
             mean_kj = np.mean(dice_acccuracies_Skj)
             std_kj = np.std(dice_acccuracies_Skj)
-            sem_kj =  np.round(std_kj/ np.sqrt(k), 4)
+            sem_kj =  np.round(std_kj/ np.sqrt(k), 3)
             w_kj = 2*1.96*sem_kj
             GCI = [np.round(mean_kj - 1.96 * std_kj / np.sqrt(k), 4), np.round(mean_kj + 1.96 * std_kj / np.sqrt(k), 4)]
+            #GCI_I = [np.round(mean_kj- w_kj/2, 3), np.round(mean_kj + w_kj/2, 3)]
 
             SET_k.append(k) 
             SET_u_k_j.append(mean_kj) # list of means of 100 k samples
@@ -69,12 +71,12 @@ def create_subsampling_data(K_samples, data, save_dir, name, metric_name):
 
 
             # Bootstrapping Analysis of the sub-samples
-            mean_kj_star, std_kj_star, w_kj_star, BCI = Bootstrap_Analysis(dice_acccuracies_Skj)
+            mean_kj_star, std_kj_star, w_kj_star, BCI= Bootstrap_Analysis(dice_acccuracies_Skj)
 
             SET_u_star_k_j.append(mean_kj_star)
             SET_SEM_star_k_j.append(std_kj_star)
             SET_W_kj_star.append(w_kj_star)
-            SET_BCI_0.append(BCI[0])
+            SET_BCI_0.append(BCI[0]) # the values are independent of the mean
             SET_BCI_1.append(BCI[1])
 
     sample_data = {'sample-set':SET_k, 'u-kj': SET_u_k_j,'sigma-kj': SET_sigma_k_j, 'SEM-kj': SET_SEM_k_j,
@@ -159,7 +161,9 @@ def Bootstrap_Analysis(data, k= None):
     w_star = conf_interval[-1] - conf_interval[0]
     mu_star = np.mean(bs_replicates)
     sem_star = np.std(bs_replicates)
+
+    #CI_star = [-1.96*sem_star, 1.96*sem_star]
     #print("w*={}".format(conf_interval[-1] - conf_interval[0]))
     #print(str(mu_star) + "&" + str(sem_star) + "&" + str(w_star))
-    return mu_star, sem_star, w_star, conf_interval
+    return np.round(mu_star, 3), np.round(sem_star,3),  np.round(w_star, 3), np.round(conf_interval,3)
 

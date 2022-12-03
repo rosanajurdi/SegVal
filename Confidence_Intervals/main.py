@@ -30,28 +30,45 @@ def run(args: argparse.Namespace):
 
     path = root_path.split(os.path.basename(root_path))
     data = pd.read_csv(root_path)
-    data.columns = ['index', 'metric']
+    if len(data.columns) == 2:
+        data.columns = ['index', 'metric']
+    elif len(data.columns) == 3:
+        data.columns = ['id', 'index', 'metric']
+        data = data[['index', 'metric']]
 
-    if 'dice' in os.path.basename(root_path):
-        metric_name = 'DSC'
-        data['metric'] *= 100
-        data['metric'] = (data['metric']).round(2)
-    elif 'hauss' in os.path.basename(root_path):
+
+
+    if 'hauss' in os.path.basename(root_path):
         metric_name = 'HD'
 
+        #data['metric'] *= 100
+        #data['metric'] = (data['metric']).round(2)
+    elif 'dice' or 'Dice' in os.path.basename(root_path):
+        metric_name = 'DSC'
+
+
+    # create the sub-sample file
+    today = datetime.now()
+    d4 = today.strftime("%b%d%H")
+    folder = "subsampled-stats-{}-{}-{}.csv".format(metric_name, name, str(d4))
+    print("results will be saved under ", folder)
     # print Analytical statistical alues:
-    print("Analytical statistical alues")
-    mean, std, SEM, w = statistical_analysis(data)
+    print("Analytical statistical values")
+    mean, std, SEM, w, CI = statistical_analysis(data)
 
     # Generate the Gaussian Table:
     print("Generate the Gaussian Table")
-    Generate_gaussian_dist_table(std, path[0])
+    #Generate_gaussian_dist_table(std, path[0])
 
     print("Conduct Bootstrapping on the entire dataset")
     # Conduct Bootstrapping on the entire dataset.
     mu_star, sem_star, w_star, conf_interval = Bootstrap_Analysis(data)
-    print(str(mean) + "&" + str(std) + "&" + str(SEM) + "&" + str(w) + "&" +
-          str(mu_star)+ "&" + str(sem_star)+ "&" + str(w_star) + str(conf_interval) )
+    #print(str(str(w) + "star:" + str(w_star)))
+
+
+    print("stats and bootstrapp: {}  &  {}  &  {}  &  [-{}, {}]  & {} &  {} &  [-{}, {}]".format(
+        mean,std,SEM,-w / 2, w / 2,mu_star,sem_star,-w_star / 2.0, -w_star / 2.0
+    ))
 
 
     #Visualize the Distribution of the entire dataset:
@@ -71,10 +88,7 @@ def run(args: argparse.Namespace):
         plt.title('Histogram and Density Distribution of {} Dataset.'.format(name))
         plt.savefig(os.path.join(path[0], 'Distribution-{}-{}'.format(name, metric_name)))
 
-    # create the sub-sample file
-    today = datetime.now()
-    d4 = today.strftime("%b%d%H")
-    folder = "subsampled-stats-{}-{}-{}.csv".format(metric_name, name,str(d4))
+
 
     save_dir = os.path.join(path[0],folder.split('.csv')[0])
     if os.path.isdir(save_dir) is False:
@@ -85,7 +99,7 @@ def run(args: argparse.Namespace):
     root_path = a
     basepath = root_path.split(os.path.basename(root_path))[0]
     df = pd.read_csv(root_path)
-
+    '''
     if visualize_sabsamples is True:
         # Visualizing the subsampled distribution
         df.boxplot(column='u-kj', by='sample-set')
@@ -105,38 +119,40 @@ def run(args: argparse.Namespace):
         #df.hist(column='SEM-kj', by='sample-set')
         #plt.savefig(os.path.join(basepath, "Hist-Hippo-SEM-kj"))
         print('hello 2')
-
-
-
+    '''
     print("Statistical Analysis ")
     txt_file= open(os.path.join(save_dir, 'txt_log.txt'), 'w')
-    for k in K_samples:
-        df_sample = df[df['sample-set']== k]
-        assert df_sample.__len__() == 100 # Make sure that there are only a 100 samples selected.
-
-        mean_variation = '{} $\pm$ {} '.format(df_sample['u-kj'].mean().round(2), df_sample['u-kj'].std().round(2))
-        std_variation = '{} $\pm$ {}'.format(df_sample['sigma-kj'].mean().round(2), df_sample['sigma-kj'].std().round(2))
-        SEM_Variation =  '{} $\pm$ {}'.format(df_sample['SEM-kj'].mean().round(2), df_sample['SEM-kj'].std().round(2))
-        Width_Variation = '{} $\pm$ {}'.format(df_sample['w-kj'].mean().round(2), df_sample['w-kj'].std().round(2))
-
-        txt_file.write('k = ' + str(k) + "&" +mean_variation + "&" + std_variation + "&" + SEM_Variation + "&" + Width_Variation  + '\n ')
-
-        print('$k$ = ' + str(k) + "&$" +mean_variation + "$&$" + std_variation + "$&$" + SEM_Variation + "$&$" + Width_Variation+ "$&")
-
-
     print("Bootstrapping Analysis ")
-    txt_file_Boot= open(os.path.join(save_dir, 'Boot_txt_log.txt'), 'w')
+    txt_file_Boot = open(os.path.join(save_dir, 'Boot_txt_log.txt'), 'w')
+
     for k in K_samples:
         df_sample = df[df['sample-set']== k]
         assert df_sample.__len__() == 100 # Make sure that there are only a 100 samples selected.
 
-        mean_variation_star = '{} \pm {} '.format(df_sample['u-kj-star'].mean().round(2), df_sample['u-kj-star'].std().round(2))
-        SEM_Variation_star =  '{} \pm {}'.format(df_sample['SEM-kj-star'].mean().round(2), df_sample['SEM-kj-star'].std().round(2))
-        Width_Variation_star = '{} \pm {}'.format(df_sample['w-kj-star'].mean().round(2), df_sample['w-kj-star'].std().round(2))
+        mean_variation = '{} $\pm$ {} '.format(df_sample['u-kj'].mean().round(3), df_sample['u-kj'].std().round(3))
+        std_variation = '{} $\pm$ {}'.format(df_sample['sigma-kj'].mean().round(3), df_sample['sigma-kj'].std().round(3))
+        SEM_Variation =  '{} $\pm$ {}'.format(df_sample['SEM-kj'].mean().round(3), df_sample['SEM-kj'].std().round(3))
+        Width_Variation = '{} $\pm$ {}'.format(df_sample['w-kj'].mean().round(3), df_sample['w-kj'].std().round(3))
+        width_k = df_sample['w-kj'].mean().round(2)
+        CI = '[-{}, {}]'.format(width_k/2.0, width_k/2)
 
-        txt_file_Boot.write('$k$ = ' + str(k) + "&" +mean_variation_star +  "&" + SEM_Variation_star + "&" + Width_Variation_star  + '\n ')
+        txt_file.write('$k =  {{k}}$ & ' + '\n ')
 
-        print('$k$ = ' + str(k) + "&" +mean_variation_star +  "&" + SEM_Variation_star + "&" + Width_Variation_star)
+
+
+
+        mean_variation_star = '{} $\pm$ {} '.format(df_sample['u-kj-star'].mean().round(3),
+                                                    df_sample['u-kj-star'].std().round(3))
+        SEM_Variation_star =  '{} $\pm$ {}'.format(df_sample['SEM-kj-star'].mean().round(3),
+                                                   df_sample['SEM-kj-star'].std().round(3))
+        Width_Variation_star = '{} \pm {}'.format(df_sample['w-kj-star'].mean().round(3),
+                                                  df_sample['w-kj-star'].std().round(3))
+        CI_star = '[-{}, {}]'.format(df_sample['w-kj-star'].mean().round(3) / 2.0, df_sample['w-kj-star'].mean().round(3) / 2)
+        txt_file_Boot.write('$k$ = ' + str(k) + "$&$" +mean_variation_star +  "$&$" + SEM_Variation_star + "$&$"
+                            + "$&$"  + Width_Variation_star + "$&$"   + "$"  + '\n ')
+
+        print('$k$ = ' + str(k) + "&" + mean_variation + "&" + std_variation + "&" + SEM_Variation +
+                       "&" + CI + "&"  +mean_variation_star +  "&" + SEM_Variation_star + "&" + CI_star)
 
 
 
@@ -145,7 +161,7 @@ def get_args() -> argparse.Namespace:
     parser.add_argument('--dataset', type=str, default='hippo')
 
     parser.add_argument('--root_path', type=str,
-                        default='/Users/rosana.eljurdi/PycharmProjects/SegVal_Project/Stats/Haussdorf_Distance/results-hauss-3D.csv')
+                        default='/Users/rosana.eljurdi/PycharmProjects/nnUNet_SegVal/Stats/Haussdorf/results-hauss-3D-L1.csv')
 
     parser.add_argument('--visualize' ,  type=str, default=True)
     parser.add_argument('--visualize_sabsamples', type=str, default=True)

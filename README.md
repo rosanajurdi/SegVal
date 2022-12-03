@@ -78,24 +78,33 @@ can directly copy and paste it into your overleaf project.
 
 The code will also generate the sub-samples csv file which contains the analytical and bootstrap values depending on 
 parameter k. All these files are saved in the [Stats]() directory under a sub-directory having the following name format:
+
+The Stats (result) directory has the following format. Each run is named according to the Date and time the run is conducted 
+the type of the dataset used and the performance metric under the following form. The first £3 branches of the structure, 
+you have to make sure to do on your own so that no overlapp between results happen, while the rest is automatic. 
 ```
 subsampled-stats-{PM}-{datasetname}-MonthDateTime
 ```
-The Stats (result) directory has the following format:
+
 
 ```
 Stats/
-    ├── Haussdorf-Distance
-    │   └── subsampled-stats-hippo-HD-Nov1705
+    ├── FrameWork-A
+    │   └── Hippocampus
+               └── Dice Accuracy
+                    └── subsampled-stats-hippo-HD-Nov1705   
+            │           ├── Boot_txt_log.txt
+            │           └── subsampled-stats-Brain-Oct05.csv
+            │           └── Boot_txt_log.txt
+        └── BrainTumor
+    │       
+    └──  FrameWork-B
+│       └── Hippocampus
+            └── subsampled-stats-hippo-HD-Nov1705   
     │           ├── Boot_txt_log.txt
     │           └── subsampled-stats-Brain-Oct05.csv
     │           └── Boot_txt_log.txt
-    │       
-    └──  Dice_Accuracy
-    │       └── subsampled-stats-hippo-Apr1010
-    │            ├── Boot_txt_log.txt
-    │           └── subsampled-stats-Brain-Oct05.csv
-    │           └── Boot_txt_log.txt
+        └── BrainTumor
 
 
 ```

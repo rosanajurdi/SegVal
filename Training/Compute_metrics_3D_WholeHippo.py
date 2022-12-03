@@ -100,10 +100,6 @@ for patient in patient_ids:
     Volume_3D_pred_multi = [fix_it(np.load(p)[0]) for p in pred_paths]
     Volume_3D_pred = np.array([np.where(a == 2, 1, a) for a in Volume_3D_pred_multi])
 
-    '''
-    for slice, file in zip(*[Volume_3D_pred, basenames]):
-        plt.imsave(os.path.join('../Results/predictions_img','{}.png'.format(file.split('.npy')[0]) ), slice )
-    '''
     gt_paths: List[Path] = list(path.rglob('{}_*'.format(patient)))
 
     Volume_3D_gt_multi = [np.load(os.path.join(gt_dir, p)) for p in basenames]
