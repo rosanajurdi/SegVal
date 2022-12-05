@@ -4,14 +4,14 @@ from functools import partial
 from multiprocessing.pool import Pool
 from pathlib import Path
 from random import random
-from medpy.metric.binary import hd
+
 import numpy as np
 import scipy as sp
 import torch
 from PIL import Image, ImageOps
 from scipy.ndimage import distance_transform_edt as distance
 from scipy.spatial.distance import directed_hausdorff
-from skimage.io import imsave
+
 from torch import Tensor
 from torch import einsum
 from tqdm import tqdm

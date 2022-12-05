@@ -18,12 +18,12 @@ import os
 import csv
 from utils import dice_coef, dice_batch, save_images, tqdm_, haussdorf, probs2one_hot, class2one_hot, numpy_haussdorf
 
-root='/network/lustre/iss02/aramis/users/rosana.eljurdi/Validation_Project/Hippocampus/train/fold_1/npy'
-net_path = '/network/lustre/iss02/aramis/users/rosana.eljurdi/Validation_Project/Hippocampus/train/fold_1/results_NEW/best2.pkl'
+root='/Users/rosana.eljurdi/Documents/Projects/Conf_Seg/Confidence_Intervals_Olivier/Task01_BrainTumour/Splits/test_npy/test_npy'
+net_path = '/Users/rosana.eljurdi/PycharmProjects/SegVal_Project/Brain/best2.pkl'
 
 net = torch.load(net_path, map_location=torch.device('cpu'))
-n_classes = 3
-n = 2
+n_classes = 4
+n = 3
 
 fieldnames = ['SLICE_ID', 'dice', 'haus']
 fold_nb = net_path.split('/')[-2]

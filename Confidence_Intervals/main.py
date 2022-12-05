@@ -161,12 +161,12 @@ def get_args() -> argparse.Namespace:
     parser.add_argument('--dataset', type=str, default='hippo')
 
     parser.add_argument('--root_path', type=str,
-                        default='/Users/rosana.eljurdi/PycharmProjects/nnUNet_SegVal/Stats/Haussdorf/results-hauss-3D-L1.csv')
+                        default='/Users/rosana.eljurdi/PycharmProjects/nnUNet_SegVal/nnUNet_preprocessed/Task001_SegVal_BrainTumor/results-hauss-3D-L1.csv')
 
     parser.add_argument('--visualize' ,  type=str, default=True)
     parser.add_argument('--visualize_sabsamples', type=str, default=True)
     parser.add_argument('--K_samples', type=list,
-                        default=[10, 20, 30, 50, 100, 110])
+                        default=[10, 20, 30, 50, 100, 150, 200,250,300,334])
 
     args = parser.parse_args()
 
@@ -181,7 +181,7 @@ if __name__ == '__main__':
     #print(a)
     #b = Bootstrap_Analysis(data)
     #print(b)
-    run(get_args())
-
+    #run(get_args())
+    Generate_gaussian_dist_table()
 
 
