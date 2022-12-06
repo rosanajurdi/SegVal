@@ -182,6 +182,7 @@ if __name__ == '__main__':
     #b = Bootstrap_Analysis(data)
     #print(b)
     #run(get_args())
+    print("this is the Mac Version")
     Generate_gaussian_dist_table()
 
 

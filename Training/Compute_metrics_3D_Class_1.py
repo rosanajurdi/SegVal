@@ -17,7 +17,7 @@ from typing import List
 from surface_distance import metrics
 import torch
 
-
+print("this is the mac versGIT STionGI")
 #prediction and ground-truth directories:
 root_path = '/Users/rosana.eljurdi/Documents/Projects/Conf_Seg/Confidence_Intervals_Olivier/Task04_Hippocampus/Splits/test/test_npy'
 fold_path = os.path.join(root_path, '')
